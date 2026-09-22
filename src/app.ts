@@ -6,6 +6,7 @@ import fs from "fs";
 
 // importa a classe player do arquivo Player.ts
 import { Player } from "./models/player.js"
+import { setSourceMapsSupport } from "module";
 
 // Cria uma aplicação Express
 // A função express() devolve um objeto que representa o servidor da aplicação
@@ -56,7 +57,7 @@ function loadPlayerState(): Player {
     return new Player(playerData.name, playerData.health, playerData.level);
   }
   // cria um novo player  se não existir cpm nome "JOGADOR1", 100 de vida e nivel 1
-  const newplayer = new Player("wesley", 100, 1);
+  const newplayer = new Player("mello", 100, 1);
   savePlayerState(newplayer);
   return newplayer;
 }
@@ -85,6 +86,50 @@ app.post("/player/attack", (req: Request, res: Response) => {
   });
 });
 
+
+app.post("/up/level", (req:Request, res: Response)=> {
+  player1.level +=1;
+  res.json({
+    //Mostra a mensagem de nível aumentado com sucesso
+    message: "nivel aumentado com sucesso",
+    curretLevel: player1.level
+  });
+});
+
+
+
+
+app.post("/player/take_Healt", (req: Request, res: Response) => {
+  const { Healt } = req.body;
+  player1.health += Healt;
+savePlayerState(player1)
+res.json({
+  // Mostra a mensagem de saúde com sucesso
+  message: "Saúde adicionada com sucesso",
+  //Retorna o valor da saúde atual
+  currentHealth: player1.health
+});
+});
+
+//Rota para aumentar o nível do jogador 
+// Quando o usúario acessar a rota "/level_up" com uma requisição POST, o servidor aumentará o nível do jogador em 1
+// método takeDamage() do jogador, pasando o valor do dano recebido no corpo da requisição (req.body.amount).
+app.post("/player/level_up", (req: Request, res: Response) => {
+  player1.level += 1;
+  savePlayerState(player1);
+  res.json({
+    // Retorna a mensagem de nível aumentado com sucesso
+    message: "Nível aumentado com sucesso!",
+    currentLevel: player1.level
+  });
+});
+
+
+
+
+
+
+
 app.post("/player/take-damage", (req: Request, res: Response) => {
   const { damage } = req.body;
   const damageMessage = player1.takedamage(damage);
@@ -105,4 +150,6 @@ app.listen(PORT, () => {
   console.log(`GET http://localhost:${PORT}/player - Obter informações do jogador`);
   console.log(`POST http://localhost:${PORT}/player/attack - Jogador realiza um ataque`);
   console.log(`POST http://localhost:${PORT}/player/take-dagame - jogador recebe dano`);
+  console.log(`POST http://localhost:${PORT}/player/level_up - upar o level`);
+  console.log(`POSThttp://localhost:${PORT}/player/take_healt - aumentar a vida`);
 });
